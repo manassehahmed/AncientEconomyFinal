@@ -1,0 +1,75 @@
+{
+  "nileFlood": {
+    "id": "nile-flood",
+    "name": "Nile Flood Variability",
+    "lat": 30.0,
+    "lng": 31.0,
+    "type": "climate",
+    "description": "Nile flood levels varied significantly, affecting grain production in Egypt. Low floods led to famine; high floods could damage infrastructure. Critical for grain supply to Athens.",
+    "variability": "High - 15-20% annual variation",
+    "impact": "Direct correlation with grain yields in Egypt (Manning 2018)"
+  },
+  "methanaVolcano": {
+    "id": "methana-volcano",
+    "name": "Methana Volcano",
+    "lat": 37.6167,
+    "lng": 23.3333,
+    "type": "volcanic",
+    "description": "Thucydides 3.89-90: Volcanic activity at Methana c. 425 BCE. Localized impact on weather and agriculture. Ash fall could affect crops and shipping visibility.",
+    "eruption": "c. 425 BCE",
+    "source": "Thucydides, History of the Peloponnesian War 3.89-90",
+    "impact": "Localized weather disruption, ash fall on crops"
+  },
+  "okmokVolcano": {
+    "id": "okmok-volcano",
+    "name": "Okmok Volcanic Aerosol (43 BCE)",
+    "lat": 53.43,
+    "lng": -168.13,
+    "type": "global-volcanic",
+    "description": "Okmok eruption in 43 BCE caused global volcanic aerosol effects. Reduced solar radiation led to cooler temperatures, crop failures, and grain shortages across the Mediterranean.",
+    "eruption": "43 BCE",
+    "impact": "Global climate cooling, reduced crop yields, grain price spikes",
+    "aerosol": "High - Global atmospheric effects"
+  },
+  "etesianWinds": {
+    "id": "etesian-winds",
+    "name": "Etesian Winds",
+    "type": "wind",
+    "description": "Seasonal northerly winds (July-September) blowing across the Aegean. Critical for grain shipping from Egypt and the Black Sea to Athens. Winds facilitate northward sailing but can hinder southward routes.",
+    "direction": "North to South",
+    "season": "July-September",
+    "impact": "Determines optimal shipping windows for grain transport (Horden & Purcell 2000)",
+    "arrows": [
+      {
+        "start": [40.0, 25.0],
+        "end": [35.0, 25.0],
+        "strength": "strong"
+      },
+      {
+        "start": [39.0, 24.0],
+        "end": [34.0, 24.0],
+        "strength": "strong"
+      },
+      {
+        "start": [38.0, 23.0],
+        "end": [33.0, 23.0],
+        "strength": "moderate"
+      },
+      {
+        "start": [37.0, 22.0],
+        "end": [32.0, 22.0],
+        "strength": "moderate"
+      },
+      {
+        "start": [36.0, 26.0],
+        "end": [31.0, 26.0],
+        "strength": "strong"
+      },
+      {
+        "start": [35.0, 27.0],
+        "end": [30.0, 27.0],
+        "strength": "moderate"
+      }
+    ]
+  }
+}

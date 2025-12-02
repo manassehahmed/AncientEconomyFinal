@@ -1,0 +1,75 @@
+[
+  {
+    "id": "egypt-athens",
+    "name": "Egypt to Athens",
+    "source": "alexandria",
+    "destination": "athens",
+    "waypoints": [
+      [31.2001, 29.9187],
+      [33.0, 30.0],
+      [35.0, 28.0],
+      [36.0, 26.0],
+      [37.0, 24.0],
+      [37.9838, 23.7275]
+    ],
+    "description": "Primary grain route from Egypt. Affected by Etesian winds (July-September) which facilitate northward sailing. Nile flood variability impacts grain availability."
+  },
+  {
+    "id": "black-sea-athens",
+    "name": "Black Sea to Athens",
+    "source": "chersonesos",
+    "destination": "athens",
+    "waypoints": [
+      [44.6103, 33.4888],
+      [42.0, 32.0],
+      [41.0082, 28.9784],
+      [40.0, 27.0],
+      [38.5, 25.5],
+      [37.9838, 23.7275]
+    ],
+    "description": "Black Sea grain route via Byzantium. Weather conditions in the Bosporus and Hellespont critical. Seasonal winds affect passage."
+  },
+  {
+    "id": "sicily-athens",
+    "name": "Sicily to Athens",
+    "source": "syracuse",
+    "destination": "athens",
+    "waypoints": [
+      [37.0755, 15.2866],
+      [37.5, 18.0],
+      [37.8, 21.0],
+      [37.9, 23.0],
+      [37.9838, 23.7275]
+    ],
+    "description": "Sicilian grain route. Affected by Mediterranean weather patterns and volcanic activity (e.g., Etna). Etesian winds can assist or hinder depending on timing."
+  },
+  {
+    "id": "cyrene-athens",
+    "name": "Cyrene to Athens",
+    "source": "cyrene",
+    "destination": "athens",
+    "waypoints": [
+      [32.8256, 21.8583],
+      [34.0, 22.5],
+      [35.5, 23.5],
+      [37.0, 23.5],
+      [37.9838, 23.7275]
+    ],
+    "description": "North African grain route. Arid climate makes production sensitive to rainfall. Etesian winds affect shipping timing and routes."
+  },
+  {
+    "id": "phoenicia-athens",
+    "name": "Phoenicia to Athens",
+    "source": "tyre",
+    "destination": "athens",
+    "waypoints": [
+      [33.2708, 35.1961],
+      [34.0, 33.0],
+      [35.5, 30.0],
+      [36.5, 27.0],
+      [37.5, 24.5],
+      [37.9838, 23.7275]
+    ],
+    "description": "Phoenician grain route. Weather patterns along the Levantine coast affect shipping. Etesian winds influence Aegean passage."
+  }
+]

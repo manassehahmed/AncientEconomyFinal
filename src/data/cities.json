@@ -1,0 +1,152 @@
+[
+  {
+    "id": "athens",
+    "name": "Athens",
+    "lat": 37.9838,
+    "lng": 23.7275,
+    "type": "destination",
+    "grainPrice": null,
+    "cropFailureRisk": 28,
+    "description": "Primary grain import destination. High crop failure risk (28%) due to Attic soil limitations and weather variability."
+  },
+  {
+    "id": "alexandria",
+    "name": "Alexandria",
+    "lat": 31.2001,
+    "lng": 29.9187,
+    "type": "source",
+    "grainPrice": 2.5,
+    "cropFailureRisk": null,
+    "description": "Major grain export hub. Zenon Papyri price: 2.5 drachmas per medimnos. Weather-dependent Nile flood affects supply."
+  },
+  {
+    "id": "nile-delta",
+    "name": "Nile Delta",
+    "lat": 31.0,
+    "lng": 31.0,
+    "type": "source",
+    "grainPrice": 2.2,
+    "cropFailureRisk": null,
+    "description": "Fertile grain-producing region. Zenon Papyri price: 2.2 drachmas per medimnos. Nile flood variability critical for yields."
+  },
+  {
+    "id": "fayum",
+    "name": "Fayum",
+    "lat": 29.3081,
+    "lng": 30.8419,
+    "type": "source",
+    "grainPrice": 2.0,
+    "cropFailureRisk": null,
+    "description": "Agricultural center. Zenon Papyri price: 2.0 drachmas per medimnos. Lake Moeris irrigation dependent on Nile floods."
+  },
+  {
+    "id": "chersonesos",
+    "name": "Chersonesos",
+    "lat": 44.6103,
+    "lng": 33.4888,
+    "type": "source",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Black Sea grain source. Weather patterns affect shipping through the Hellespont and Bosporus."
+  },
+  {
+    "id": "byzantium",
+    "name": "Byzantium",
+    "lat": 41.0082,
+    "lng": 28.9784,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Critical transit point for Black Sea grain. Weather conditions in the Bosporus affect shipping."
+  },
+  {
+    "id": "syracuse",
+    "name": "Syracuse",
+    "lat": 37.0755,
+    "lng": 15.2866,
+    "type": "source",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Sicilian grain source. Mediterranean weather patterns and volcanic activity affect production and shipping."
+  },
+  {
+    "id": "cyrene",
+    "name": "Cyrene",
+    "lat": 32.8256,
+    "lng": 21.8583,
+    "type": "source",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "North African grain source. Arid climate makes production sensitive to rainfall patterns."
+  },
+  {
+    "id": "tyre",
+    "name": "Tyre",
+    "lat": 33.2708,
+    "lng": 35.1961,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Phoenician trading port. Weather affects grain transit from Egypt and local production."
+  },
+  {
+    "id": "sidon",
+    "name": "Sidon",
+    "lat": 33.5631,
+    "lng": 35.3689,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Phoenician trading port. Coastal weather patterns influence grain shipping routes."
+  },
+  {
+    "id": "rhodes",
+    "name": "Rhodes",
+    "lat": 36.4412,
+    "lng": 28.2225,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Important maritime hub. Etesian winds affect grain shipping routes through the Aegean."
+  },
+  {
+    "id": "crete",
+    "name": "Crete",
+    "lat": 35.2401,
+    "lng": 24.8093,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Island transit point. Weather patterns in the southern Aegean affect grain shipping."
+  },
+  {
+    "id": "delos",
+    "name": "Delos",
+    "lat": 37.3997,
+    "lng": 25.2697,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Sacred island and trading center. Etesian winds critical for grain shipping timing."
+  },
+  {
+    "id": "aegina",
+    "name": "Aegina",
+    "lat": 37.7467,
+    "lng": 23.4275,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Near Athens, important for grain distribution. Local weather affects final leg of grain transport."
+  },
+  {
+    "id": "aspendos",
+    "name": "Aspendos",
+    "lat": 36.9389,
+    "lng": 31.1722,
+    "type": "transit",
+    "grainPrice": null,
+    "cropFailureRisk": null,
+    "description": "Pamphylian port. Weather patterns affect grain transit from eastern sources."
+  }
+]
