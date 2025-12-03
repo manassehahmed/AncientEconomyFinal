@@ -1,9 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import delosImg from '../Images/Delos.jpg'
 import './Home.css'
 
 function Home() {
+  // State to track which info box is currently visible (tracks the symbol string now)
+  const [activeInfo, setActiveInfo] = useState(null)
+
   // Commodity data from historical sources
   const oliveOilData = [
     { year: 400, month: null, price: 3, source: "Delos" },
@@ -125,7 +129,8 @@ function Home() {
       symbol: "WHT-ARC",
       data: processData(wheatData),
       color: "#f97316",
-      unit: "Drachmas / Medimnos"
+      unit: "Drachmas / Medimnos",
+      description: "Enter your text for Wheat here. Wheat prices in Delos fluctuated significantly during the Hellenistic period."
     }
 
     const barley = {
@@ -133,15 +138,8 @@ function Home() {
       symbol: "BRLY-ARC",
       data: processData(barleyData),
       color: "#eab308",
-      unit: "Drachmas / Medimnos"
-    }
-
-    const egyptianWheat = {
-      name: "Egyptian Wheat",
-      symbol: "EGWHT-ARC",
-      data: processData(egyptianWheatData),
-      color: "#dc2626",
-      unit: "Drachmas / Artaba (29 kg)"
+      unit: "Drachmas / Medimnos",
+      description: "Enter your text for Barley here. Barley was the primary sustenance for the lower classes."
     }
 
     const oil = {
@@ -149,7 +147,8 @@ function Home() {
       symbol: "OIL-ARC",
       data: processData(oliveOilData),
       color: "#65a30d",
-      unit: "Drachmas / Khous"
+      unit: "Drachmas / Khous",
+      description: "Enter your text for Olive Oil here. Used for food, lighting, and bathing rituals."
     }
 
     const pig = {
@@ -157,10 +156,24 @@ function Home() {
       symbol: "PIG-ARC",
       data: processData(pigData),
       color: "#ec4899",
-      unit: "Drachmas / Animal"
+      unit: "Drachmas / Animal",
+      description: "Enter your text for Pigs here. Livestock prices often correlated with religious festivals."
     }
 
-    return [wheat, barley, egyptianWheat, oil, pig]
+    const egyptianWheat = {
+      name: "Egyptian Wheat",
+      symbol: "EGWHT-ARC",
+      data: processData(egyptianWheatData),
+      color: "#dc2626",
+      unit: "Drachmas / Artaba (29 kg)",
+      description: "Enter your text for Egyptian Wheat here. Egypt was the breadbasket of the ancient Mediterranean."
+    }
+
+    // Return separated lists
+    return {
+      delos: [wheat, barley, oil, pig],
+      egypt: [egyptianWheat]
+    }
   }, [])
 
   const getLatestPrice = (data) => {
@@ -193,6 +206,127 @@ function Home() {
     return null
   }
 
+  // Helper function to render a single card to avoid code duplication
+  const renderCommodityCard = (commodity) => {
+    const latest = getLatestPrice(commodity.data)
+    const previous = getPreviousPrice(commodity.data)
+    const change = getPriceChange(commodity.data)
+    const isPositive = change >= 0
+    const percentChange = ((change / previous.price) * 100).toFixed(1)
+
+    return (
+      <div 
+        key={commodity.symbol} 
+        className="commodity-card"
+        style={{ position: 'relative' }}
+      >
+        {/* --- Info Icon & Tooltip Start --- */}
+        <div 
+          className="info-icon-container"
+          onMouseEnter={() => setActiveInfo(commodity.symbol)}
+          onMouseLeave={() => setActiveInfo(null)}
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            zIndex: 10,
+            cursor: 'pointer'
+          }}
+        >
+          <div style={{
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            backgroundColor: '#8B7355',
+            color: '#f4e8d0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            fontFamily: 'serif',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+          }}>
+            i
+          </div>
+          
+          {activeInfo === commodity.symbol && (
+            <div style={{
+              position: 'absolute',
+              top: '25px',
+              right: '0',
+              width: '200px',
+              backgroundColor: '#fdfbf7',
+              border: '1px solid #8B7355',
+              padding: '10px',
+              borderRadius: '4px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              zIndex: 20
+            }}>
+              <p style={{ 
+                fontSize: '12px', 
+                color: '#333', 
+                margin: 0,
+                lineHeight: '1.4'
+              }}>
+                {commodity.description}
+              </p>
+            </div>
+          )}
+        </div>
+        {/* --- Info Icon & Tooltip End --- */}
+
+        <div className="commodity-header">
+          <div>
+            <h3 className="commodity-name">{commodity.name}</h3>
+            <span className="commodity-symbol">{commodity.symbol}</span>
+          </div>
+          <div className="commodity-price-info">
+            <div className="commodity-price">{latest.price.toFixed(2)}</div>
+            <div className={`commodity-change ${isPositive ? 'positive' : 'negative'}`}>
+              {isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{percentChange}%)
+            </div>
+          </div>
+        </div>
+        <div className="commodity-unit">{commodity.unit}</div>
+        
+        <div className="chart-container">
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={commodity.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#D2B48C" opacity={0.3} />
+              <XAxis 
+                dataKey="timeValue" 
+                tickFormatter={formatBCTick} 
+                type="number" 
+                domain={['dataMin', 'dataMax']}
+                tick={{fill: '#5A5A5A', fontSize: 10}}
+                tickLine={false}
+                axisLine={{ stroke: '#8B7355', strokeWidth: 1 }}
+                dy={5}
+              />
+              <YAxis 
+                tick={{fill: '#5A5A5A', fontSize: 10}}
+                tickLine={false}
+                axisLine={false}
+                domain={['auto', 'auto']}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8B7355', strokeWidth: 1, strokeDasharray: '3 3' }} />
+              <Line 
+                type="monotone" 
+                dataKey="price" 
+                stroke={commodity.color} 
+                strokeWidth={2} 
+                dot={{ r: 3, fill: commodity.color, strokeWidth: 1, stroke: '#f4e8d0' }} 
+                activeDot={{ r: 5, strokeWidth: 0 }}
+                animationDuration={500}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="home-page">
       <div className="home-container">
@@ -203,67 +337,110 @@ function Home() {
 
         <div className="market-overview">
           <h2>Market Overview</h2>
-          <div className="commodities-grid">
-            {commodities.map((commodity, index) => {
-              const latest = getLatestPrice(commodity.data)
-              const previous = getPreviousPrice(commodity.data)
-              const change = getPriceChange(commodity.data)
-              const isPositive = change >= 0
-              const percentChange = ((change / previous.price) * 100).toFixed(1)
+
+          {/* WARNING BANNER */}
+          <Link to="/justprice" style={{ textDecoration: 'none' }}>
+            <div style={{
+              backgroundColor: '#fff3cd',
+              border: '1px solid #856404',
+              color: '#856404',
+              padding: '15px',
+              borderRadius: '8px',
+              marginBottom: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '15px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ffeeba'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff3cd'}
+            >
+              <div style={{ fontSize: '24px' }}>⚠️</div>
+              <div>
+                <strong>Caveat Emptor!</strong> Watch out! Don't get too invested in predicting these prices. 
+                Remember that all these commodities have a <u>Just Price</u>!
+              </div>
+            </div>
+          </Link>
+
+          {/* Hellenistic Greece Section */}
+          <div style={{ marginTop: '30px', marginBottom: '40px' }}>
+            <h3 style={{ 
+              color: '#8B7355', 
+              borderBottom: '1px solid #D2B48C', 
+              paddingBottom: '10px', 
+              marginBottom: '20px',
+              fontFamily: 'serif'
+            }}>
+              Hellenistic Greece
+            </h3>
+            
+            {/* Delos Box Container */}
+            <div style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.5)', 
+              border: '1px solid #D2B48C', 
+              borderRadius: '8px',
+              padding: '20px'
+            }}>
               
-              return (
-                <div key={index} className="commodity-card">
-                  <div className="commodity-header">
-                    <div>
-                      <h3 className="commodity-name">{commodity.name}</h3>
-                      <span className="commodity-symbol">{commodity.symbol}</span>
-                    </div>
-                    <div className="commodity-price-info">
-                      <div className="commodity-price">{latest.price.toFixed(2)}</div>
-                      <div className={`commodity-change ${isPositive ? 'positive' : 'negative'}`}>
-                        {isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{percentChange}%)
-                      </div>
-                    </div>
-                  </div>
-                  <div className="commodity-unit">{commodity.unit}</div>
-                  
-                  <div className="chart-container">
-                    <ResponsiveContainer width="100%" height={200}>
-                      <LineChart data={commodity.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#D2B48C" opacity={0.3} />
-                        <XAxis 
-                          dataKey="timeValue" 
-                          tickFormatter={formatBCTick} 
-                          type="number" 
-                          domain={['dataMin', 'dataMax']}
-                          tick={{fill: '#5A5A5A', fontSize: 10}}
-                          tickLine={false}
-                          axisLine={{ stroke: '#8B7355', strokeWidth: 1 }}
-                          dy={5}
-                        />
-                        <YAxis 
-                          tick={{fill: '#5A5A5A', fontSize: 10}}
-                          tickLine={false}
-                          axisLine={false}
-                          domain={['auto', 'auto']}
-                        />
-                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8B7355', strokeWidth: 1, strokeDasharray: '3 3' }} />
-                        <Line 
-                          type="monotone" 
-                          dataKey="price" 
-                          stroke={commodity.color} 
-                          strokeWidth={2} 
-                          dot={{ r: 3, fill: commodity.color, strokeWidth: 1, stroke: '#f4e8d0' }} 
-                          activeDot={{ r: 5, strokeWidth: 0 }}
-                          animationDuration={500}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+              {/* Delos Header with Image */}
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', gap: '20px' }}>
+                <div style={{ 
+                  width: '120px', 
+                  height: '120px', 
+                  borderRadius: '50%', 
+                  overflow: 'hidden', 
+                  border: '3px solid #8B7355',
+                  flexShrink: 0
+                }}>
+                  <img 
+                    src={delosImg} 
+                    alt="Island of Delos" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
                 </div>
-              )
-            })}
+                <div>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', color: '#5A4A35' }}>Delos</h4>
+                  <p style={{ margin: 0, maxWidth: '600px', lineHeight: '1.5', color: '#4a4a4a' }}>
+                    The sacred island and major commercial center of the Aegean. 
+                    Known for its tax-free port and strategic location, prices here serve as a 
+                    benchmark for the wider Hellenistic economy.
+                  </p>
+                </div>
+              </div>
+
+              {/* Delos Graphs Grid */}
+              <div className="commodities-grid">
+                {commodities.delos.map(commodity => renderCommodityCard(commodity))}
+              </div>
+            </div>
           </div>
+
+          {/* Ancient Egypt Section */}
+          <div style={{ marginTop: '30px', marginBottom: '40px' }}>
+            <h3 style={{ 
+              color: '#8B7355', 
+              borderBottom: '1px solid #D2B48C', 
+              paddingBottom: '10px', 
+              marginBottom: '20px',
+              fontFamily: 'serif'
+            }}>
+              Ancient Egypt
+            </h3>
+            
+            <div style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.5)', 
+              border: '1px solid #D2B48C', 
+              borderRadius: '8px',
+              padding: '20px'
+            }}>
+               <div className="commodities-grid">
+                {commodities.egypt.map(commodity => renderCommodityCard(commodity))}
+              </div>
+            </div>
+          </div>
+
         </div>
 
         <div className="features-grid">
