@@ -215,7 +215,7 @@ function Articles() {
               </p>
               
               <div style={{ fontSize: '11px', color: '#999', marginTop: '5px' }}>
-                By The Trapezites • 1 hr ago
+                By Editor • 1 hr ago
               </div>
             </div>
           </Link>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './GrainArticle.css'; // Reusing your base styles
+import '../pages/GrainArticle.css'; // Reusing your base styles
 
 // Game Data - Themed for Ancient Athens
 const GAME_DATA = [
@@ -37,6 +37,9 @@ function Connections() {
   const [status, setStatus] = useState('playing'); // playing, won, lost
   const [shake, setShake] = useState(false);
   const [message, setMessage] = useState("");
+  
+  // NEW: Track previous guesses to prevent duplicates
+  const [previousGuesses, setPreviousGuesses] = useState([]);
 
   const MAX_MISTAKES = 4;
 
@@ -72,6 +75,18 @@ function Connections() {
 
   const handleSubmit = () => {
     if (selected.length !== 4) return;
+
+    // NEW: Create a unique signature for this guess (sort to ignore order)
+    const guessSignature = [...selected].sort().join('|');
+
+    // NEW: Check if already guessed
+    if (previousGuesses.includes(guessSignature)) {
+      showMessage("Already guessed!");
+      return;
+    }
+
+    // NEW: Add to history
+    setPreviousGuesses([...previousGuesses, guessSignature]);
 
     // Check if selected items match any group
     const matchedGroup = GAME_DATA.find(group => 
@@ -156,7 +171,7 @@ function Connections() {
         }
 
         .conn-item {
-          aspect-ratio: 1.5; // Rectangular shape
+          aspect-ratio: 1.5;
           background: rgba(249, 243, 232, 0.9);
           border: 2px solid #D2B48C;
           border-radius: 8px;
