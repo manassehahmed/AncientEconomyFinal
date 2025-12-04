@@ -24,7 +24,7 @@ function Weather() {
   const [showOkmok, setShowOkmok] = useState(false)
   const [showCyrenaica, setShowCyrenaica] = useState(false)
   const [showBlackSeaStorms, setShowBlackSeaStorms] = useState(false)
-
+  const [showWeatherPanel, setShowWeatherPanel] = useState(false)
   // Location database
   const locationDb = {
     "Athens": [37.9838, 23.7275],
@@ -232,10 +232,10 @@ function Weather() {
 
   const amphoraeData = [
     { s: -480, e: -450, p: ["Chios", "NGR"], sec: ["Adriatic-Ionian", "SEA"], m: ["Corinth", "Lesbos"] },
-    { s: -440, e: -380, p: ["Chios", "Mende", "NGR", "SEA"], sec: ["Adriatic-Ionian", "Lesbos", "Central Greece"], m: ["Corinth", "Erythrai", "Punic", "Italy"] },
-    { s: -360, e: -340, p: ["Chios", "NGR", "SEA"], sec: ["Adriatic-Ionian"], m: ["Lesbos", "Mende"] },
-    { s: -325, e: -240, p: ["NGR", "SEA", "Pontic"], sec: ["Chios", "Corinth", "Italy", "Central Greece"], m: ["Adriatic-Ionian", "Lesbos"] },
-    { s: -230, e: -170, p: ["Rhodes", "Knidos"], sec: ["Punic", "Central Greece"], m: ["Cos", "SEA", "Chios", "NGR", "Italy", "Adriatic-Ionian", "Pontic"] }
+    { s: -449, e: -380, p: ["Chios", "Mende", "NGR", "SEA"], sec: ["Adriatic-Ionian", "Lesbos", "Central Greece"], m: ["Corinth", "Erythrai", "Punic", "Italy"] },
+    { s: -379, e: -340, p: ["Chios", "NGR", "SEA"], sec: ["Adriatic-Ionian"], m: ["Lesbos", "Mende"] },
+    { s: -339, e: -240, p: ["NGR", "SEA", "Pontic"], sec: ["Chios", "Corinth", "Italy", "Central Greece"], m: ["Adriatic-Ionian", "Lesbos"] },
+    { s: -239, e: -170, p: ["Rhodes", "Knidos"], sec: ["Punic", "Central Greece"], m: ["Cos", "SEA", "Chios", "NGR", "Italy", "Adriatic-Ionian", "Pontic"] }
   ]
 
   useEffect(() => {
@@ -379,26 +379,35 @@ function Weather() {
         })
       })
 
-      // Manage city visibility
-      const showAllLocations = cityCheckboxRef.current?.checked || false
+// Manage city visibility
+const showAllLocations = cityCheckboxRef.current?.checked || false
 
-      Object.keys(cityMarkers).forEach(name => {
-        const marker = cityMarkers[name]
-        const isMain = mainCities.includes(name)
-        const isAtWar = activeWarCities.includes(name)
+// Collect all unique sources from amphorae data and grain to keep them visible
+const tradeSources = new Set()
+amphoraeData.forEach(d => {
+  [...d.p, ...d.sec, ...d.m].forEach(city => tradeSources.add(city))
+})
+const grainSources = ["Egypt", "Cyrene", "Sicily", "Crimea"]
 
-        if (showAllLocations || isMain || isAtWar) {
-          marker.setOpacity(1)
-          if (marker.getTooltip()) {
-            marker.openTooltip()
-          }
-        } else {
-          marker.setOpacity(0)
-          if (marker.getTooltip()) {
-            marker.closeTooltip()
-          }
-        }
-      })
+Object.keys(cityMarkers).forEach(name => {
+  const marker = cityMarkers[name]
+  const isMain = mainCities.includes(name)
+  const isAtWar = activeWarCities.includes(name)
+  const isTradeSource = tradeSources.has(name)
+  const isGrainSource = grainSources.includes(name)
+
+  if (showAllLocations || isMain || isAtWar || isTradeSource || isGrainSource) {
+    marker.setOpacity(1)
+    if (marker.getTooltip()) {
+      marker.openTooltip()
+    }
+  } else {
+    marker.setOpacity(0)
+    if (marker.getTooltip()) {
+      marker.closeTooltip()
+    }
+  }
+})
 
       // Render trade routes
       tradeLayer.clearLayers()
@@ -414,6 +423,17 @@ function Weather() {
             const sCoord = locationDb[sourceName]
             if (sCoord) {
               hubCoords.forEach(hCoord => {
+                // Outline: Thicker black dashed line drawn first
+                const outline = L.polyline([sCoord, hCoord], {
+                  color: 'black',
+                  weight: weight + 2,
+                  opacity: opacity,
+                  dashArray: '4, 8',
+                  className: 'trade-route-anim'
+                })
+                tradeLayer.addLayer(outline)
+
+                // Main: Thinner gold dashed line drawn on top
                 const polyline = L.polyline([sCoord, hCoord], {
                   color: '#d4af37',
                   weight: weight,
@@ -869,121 +889,264 @@ function Weather() {
             />
             <span>Show All Locations</span>
           </label>
+          <div className="legend-divider"></div>
+          
+          <label className="toggle-label">
+            <input
+              type="checkbox"
+              checked={showWeatherPanel}
+              onChange={(e) => setShowWeatherPanel(e.target.checked)}
+            />
+            <span>Show Weather Events</span>
+          </label>
         </div>
       </div>
 
-      {/* Weather Events Panel */}
-      <div className="weather-events-panel">
+{/* Weather Events Panel */}
+<div className={`weather-events-panel ${showWeatherPanel ? 'visible' : ''}`}>
+        <style>{`
+          /* Position and Size Overrides */
+          .weather-events-panel {
+            top: 20px !important;
+            left: 20px !important;
+            right: auto !important;
+            bottom: auto !important;
+            
+            width: 280px;
+            max-height: 70vh;
+            
+            border-radius: 12px !important;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+            z-index: 2000;
+            font-family: 'Inter', sans-serif;
+
+            /* Fade Transition Logic */
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+          }
+
+          .weather-events-panel.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+          }
+
+          /* Ensure the inner container matches the roundness */
+          .glass-panel.weather-events-container {
+            border-radius: 12px !important;
+            padding: 15px !important;
+          }
+
+          /* Custom Scrollbar */
+          .weather-events-panel::-webkit-scrollbar {
+            width: 4px;
+          }
+          .weather-events-panel::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .weather-events-panel::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+          }
+
+          .weather-events-title {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #f3f4f6;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+          }
+
+          .event-buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+          }
+          .event-btn {
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+          }
+          .event-btn:hover {
+            background: rgba(55, 65, 81, 0.8);
+            border-color: rgba(255, 255, 255, 0.3);
+          }
+          .event-btn.active {
+            background: rgba(180, 83, 9, 0.2);
+            border-color: #ef4444;
+            color: #f3f4f6;
+          }
+          .event-year-tag {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+          }
+          .event-btn.active .event-year-tag {
+            color: #fca5a5;
+          }
+          .event-label-text {
+            font-size: 0.85rem;
+            font-family: serif;
+            line-height: 1.2;
+          }
+          .section-header {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            margin-top: 12px;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 2px;
+          }
+          
+          .weather-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #e5e7eb;
+            cursor: pointer;
+            padding: 6px 0;
+          }
+        `}</style>
         <div className="glass-panel weather-events-container">
           <h3 className="weather-events-title">Weather Events</h3>
-          
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showEruption305}
-              onChange={(e) => {
-                setShowEruption305(e.target.checked)
-                if (e.target.checked) setCurrentYear(-300) // Midpoint of 305-295
-              }}
-            />
-            <span>305–295 BCE Eruption Cluster</span>
-          </label>
 
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showEruption247}
-              onChange={(e) => {
-                setShowEruption247(e.target.checked)
-                if (e.target.checked) setCurrentYear(-247)
-              }}
-            />
-            <span>247 BCE Major Eruption</span>
-          </label>
-
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showEruption209}
-              onChange={(e) => {
-                setShowEruption209(e.target.checked)
-                if (e.target.checked) setCurrentYear(-209)
-              }}
-            />
-            <span>209 BCE Volcanic Event</span>
-          </label>
+          {/* Annual Section */}
+          <div className="section-header" style={{ marginTop: 0 }}>Annual Conditions</div>
 
           <label className="weather-toggle-label">
             <input
               type="checkbox"
               checked={showEtesianWinds}
-              onChange={(e) => {
-                setShowEtesianWinds(e.target.checked)
-                // Annual event - no specific year
-              }}
+              onChange={(e) => setShowEtesianWinds(e.target.checked)}
             />
-            <span>Etesian Winds (Annual)</span>
-          </label>
-
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showMethana}
-              onChange={(e) => {
-                setShowMethana(e.target.checked)
-                if (e.target.checked) setCurrentYear(-230)
-              }}
-            />
-            <span>Methana Eruption (ca. 230 BCE)</span>
+            <span>Etesian Winds</span>
           </label>
 
           <label className="weather-toggle-label">
             <input
               type="checkbox"
               checked={showAtticaRisk}
-              onChange={(e) => {
-                setShowAtticaRisk(e.target.checked)
-                // Annual event - no specific year
-              }}
+              onChange={(e) => setShowAtticaRisk(e.target.checked)}
             />
-            <span>Attica Crop Risk (Annual)</span>
-          </label>
-
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showOkmok}
-              onChange={(e) => {
-                setShowOkmok(e.target.checked)
-                if (e.target.checked) setCurrentYear(-44)
-              }}
-            />
-            <span>Okmok Eruption (44 BCE)</span>
-          </label>
-
-          <label className="weather-toggle-label">
-            <input
-              type="checkbox"
-              checked={showCyrenaica}
-              onChange={(e) => {
-                setShowCyrenaica(e.target.checked)
-                if (e.target.checked) setCurrentYear(-200) // Midpoint of 250-150
-              }}
-            />
-            <span>Cyrenaica Droughts (250–150 BCE)</span>
+            <span>Attica Crop Risk</span>
           </label>
 
           <label className="weather-toggle-label">
             <input
               type="checkbox"
               checked={showBlackSeaStorms}
-              onChange={(e) => {
-                setShowBlackSeaStorms(e.target.checked)
-                // Annual event - no specific year
-              }}
+              onChange={(e) => setShowBlackSeaStorms(e.target.checked)}
             />
-            <span>Black Sea Storms (Annual)</span>
+            <span>Black Sea Storms</span>
           </label>
+          
+          {/* Specific Events Section */}
+          <div className="section-header">Major Events</div>
+          
+          <div className="event-buttons-grid">
+            <button 
+              className={`event-btn ${showEruption305 ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption247(false); setShowMethana(false); setShowEruption209(false); 
+                setShowCyrenaica(false); setShowOkmok(false);
+                const newState = !showEruption305
+                setShowEruption305(newState)
+                if (newState) setCurrentYear(-300)
+              }}
+            >
+              <span className="event-year-tag">305–295 BCE</span>
+              <span className="event-label-text">Nile Failure Cluster</span>
+            </button>
+
+            <button 
+              className={`event-btn ${showEruption247 ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption305(false); setShowMethana(false); setShowEruption209(false); 
+                setShowCyrenaica(false); setShowOkmok(false);
+                const newState = !showEruption247
+                setShowEruption247(newState)
+                if (newState) setCurrentYear(-247)
+              }}
+            >
+              <span className="event-year-tag">247 BCE</span>
+              <span className="event-label-text">Major Volcanic Eruption</span>
+            </button>
+
+            <button 
+              className={`event-btn ${showMethana ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption305(false); setShowEruption247(false); setShowEruption209(false); 
+                setShowCyrenaica(false); setShowOkmok(false);
+                const newState = !showMethana
+                setShowMethana(newState)
+                if (newState) setCurrentYear(-230)
+              }}
+            >
+              <span className="event-year-tag">ca. 230 BCE</span>
+              <span className="event-label-text">Methana Eruption</span>
+            </button>
+
+            <button 
+              className={`event-btn ${showEruption209 ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption305(false); setShowEruption247(false); setShowMethana(false); 
+                setShowCyrenaica(false); setShowOkmok(false);
+                const newState = !showEruption209
+                setShowEruption209(newState)
+                if (newState) setCurrentYear(-209)
+              }}
+            >
+              <span className="event-year-tag">209 BCE</span>
+              <span className="event-label-text">African Monsoon Failure</span>
+            </button>
+
+            <button 
+              className={`event-btn ${showCyrenaica ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption305(false); setShowEruption247(false); setShowMethana(false); 
+                setShowEruption209(false); setShowOkmok(false);
+                const newState = !showCyrenaica
+                setShowCyrenaica(newState)
+                if (newState) setCurrentYear(-200)
+              }}
+            >
+              <span className="event-year-tag">250–150 BCE</span>
+              <span className="event-label-text">Cyrenaica Droughts</span>
+            </button>
+
+            <button 
+              className={`event-btn ${showOkmok ? 'active' : ''}`}
+              onClick={() => {
+                setShowEruption305(false); setShowEruption247(false); setShowMethana(false); 
+                setShowEruption209(false); setShowCyrenaica(false);
+                const newState = !showOkmok
+                setShowOkmok(newState)
+                if (newState) setCurrentYear(-44)
+              }}
+            >
+              <span className="event-year-tag">44 BCE</span>
+              <span className="event-label-text">Okmok Mega-Eruption</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

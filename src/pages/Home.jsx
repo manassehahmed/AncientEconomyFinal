@@ -371,7 +371,7 @@ function Home() {
       data: processData(wheatData),
       color: "#f97316",
       unit: "Drachmas / Medimnos",
-      description: "Enter your text for Wheat here. Wheat prices in Delos fluctuated significantly during the Hellenistic period."
+      description: "The first few price points are taken from a compliation of Classical sources(see Rathbone in our sources), the Hellenistic prices are of course from Delos."
     }
 
     const barley = {
@@ -380,7 +380,7 @@ function Home() {
       data: processData(barleyData),
       color: "#eab308",
       unit: "Drachmas / Medimnos",
-      description: "Enter your text for Barley here. Barley was the primary sustenance for the lower classes."
+      description: "The first few price points are taken from a compliation of Classical sources(see Rathbone in our sources), the Hellenistic prices are of course from Delos."
     }
 
     const oil = {
@@ -389,7 +389,7 @@ function Home() {
       data: processData(oliveOilData),
       color: "#65a30d",
       unit: "Drachmas / Khous",
-      description: "Enter your text for Olive Oil here. Used for food, lighting, and bathing rituals."
+      description: "The first price is from Oeconomics and refers to Lampsakos, the second is from an Athenian inscription listing the value of different sacrifices(see our sources). The rest are from Delos."
     }
 
     const pig = {
@@ -398,7 +398,7 @@ function Home() {
       data: processData(pigData),
       color: "#ec4899",
       unit: "Drachmas / Animal",
-      description: "Enter your text for Pigs here. Livestock prices often correlated with religious festivals."
+      description: "Note that these are piglet prices; piglets were not consumed, but instead sacrificed. The first two prices are from an Athenian sacrficial calendar, the rest are from Delos."
     }
 
     const egyptianWheat = {
@@ -644,9 +644,7 @@ function Home() {
                 <div>
                   <h4 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', color: '#5A4A35' }}>Delos</h4>
                   <p style={{ margin: 0, maxWidth: '600px', lineHeight: '1.5', color: '#4a4a4a' }}>
-                    The sacred island and major commercial center of the Aegean. 
-                    Known for its tax-free port and strategic location, prices here serve as a 
-                    benchmark for the wider Hellenistic economy.
+                    Delos is a small island which bore significance in the Hellenstic world due to its religious significance; the Gods Appolo and Artemis were both said to be born at Delos. As such, there was a sanctuary on the island, and from 314 BC to 167 BC the keepers of the sanctuary kept extensive records. These records are one of the few economic time series which we have from the Hellenistic era, and are hence the subject of extensive economic analysis.
                   </p>
                 </div>
               </div>
