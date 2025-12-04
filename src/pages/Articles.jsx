@@ -166,7 +166,7 @@ function Articles() {
             </div>
           </Link>
 
-          {/* Sidebar Article 2: Lending Guide (REPLACED THE FAKE OLIVE OIL ARTICLE) */}
+          {/* Sidebar Article 2: Lending Guide */}
           <Link to="/lending" style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="sidebar-card" style={{ 
               marginBottom: '25px', 
@@ -196,7 +196,7 @@ function Articles() {
                 <div style={{ 
                   width: '80px', 
                   height: '80px', 
-                  backgroundColor: '#8B7355', // Different color for distinction
+                  backgroundColor: '#8B7355', 
                   flexShrink: 0, 
                   marginLeft: '15px',
                   borderRadius: '4px',
@@ -220,16 +220,59 @@ function Articles() {
             </div>
           </Link>
 
-          {/* Sidebar Article 3: Fake Filler (Kept for visual balance) */}
-          <div className="sidebar-card" style={{ opacity: 0.6 }}>
-            <span style={{ fontSize: '11px', color: '#dc2626', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
-              WARNING
-            </span>
-            <h4 style={{ fontSize: '16px', fontFamily: 'serif', margin: '0 0 5px 0', color: '#2c2c2c' }}>
-              Spartan currency devaluation: What it means for you
-            </h4>
-            <div style={{ fontSize: '11px', color: '#999' }}>Associated Press • 3 hrs ago</div>
-          </div>
+          {/* Sidebar Article 3: Measurements (Replaced Spartan Devaluation) */}
+          <Link to="/measurements" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="sidebar-card" style={{ 
+              marginBottom: '25px', 
+              paddingBottom: '25px', 
+              borderBottom: '1px solid #e5e5e5',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              cursor: 'pointer'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#475569', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
+                    REFERENCE
+                  </span>
+                  <h4 style={{ 
+                    fontSize: '18px', 
+                    fontFamily: 'serif', 
+                    margin: '0 0 8px 0', 
+                    color: '#2c2c2c',
+                    lineHeight: '1.3'
+                  }}>
+                    Standard Weights & Measures
+                  </h4>
+                </div>
+                {/* Thumbnail placeholder */}
+                <div style={{ 
+                  width: '80px', 
+                  height: '80px', 
+                  backgroundColor: '#A0522D', 
+                  flexShrink: 0, 
+                  marginLeft: '15px',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontSize: '24px'
+                }}>
+                  📏
+                </div>
+              </div>
+              
+              <p style={{ fontSize: '14px', color: '#666', margin: 0, lineHeight: '1.5' }}>
+                 Confused by Choenix vs Cotyle? Consult our table for Attic, Roman, and Ptolemaic conversions.
+              </p>
+              
+              <div style={{ fontSize: '11px', color: '#999', marginTop: '5px' }}>
+                Updated • Daily
+              </div>
+            </div>
+          </Link>
 
         </div>
       </div>

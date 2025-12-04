@@ -11,6 +11,7 @@ import Lending from './pages/Lending'
 import Games from './pages/Games'
 import Wordle from './games/Wordle'
 import Crossword from './games/Crossword'
+import Measurments from  './pages/Measurements'
 import './App.css'
 
 function App() {
@@ -29,6 +30,8 @@ function App() {
           <Route path="/games" element={<Games />} />
           <Route path="/wordle" element={<Wordle />} />
           <Route path="/crossword" element={<Crossword />} />
+          <Route path="/measurements" element={<Measurments />} />
+          
         </Routes>
       </div>
     </Router>

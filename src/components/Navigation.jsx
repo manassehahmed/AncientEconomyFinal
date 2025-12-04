@@ -102,6 +102,22 @@ function Navigation() {
                   Just Price Explained
                 </Link>
                 <Link 
+                  to="/measurements" 
+                  style={{
+                    display: 'block',
+                    padding: '12px 20px',
+                    color: '#5A4A35',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    borderBottom: '1px solid #e6dec8',
+                    fontFamily: 'serif'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#f4e8d0'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                >
+                  Measurements Reference
+                </Link>
+                <Link 
                   to="/lending" 
                   style={{
                     display: 'block',
