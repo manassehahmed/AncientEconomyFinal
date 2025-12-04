@@ -7,6 +7,8 @@ import './Home.css'
 function Home() {
   // State to track which info box is currently visible (tracks the symbol string now)
   const [activeInfo, setActiveInfo] = useState(null)
+  // State for Babylonian Barley view toggle
+  const [showAllBabylonianPrices, setShowAllBabylonianPrices] = useState(true)
 
   // Commodity data from historical sources
   const oliveOilData = [
@@ -299,7 +301,87 @@ function Home() {
     { year: 178, month: 12, price: 3.75, source: "Delos" },
     { year: 177, month: 12, price: 4, source: "Delos" },
     { year: 174, month: 12, price: 4, source: "Delos" }
-  ];
+  ]
+
+  // Babylonian Barley data - 4 prices per decade (lowest, 2nd lowest, 2nd highest, highest)
+  const babylonianBarleyRaw = [
+    { decade: "299–290", year: 295, prices: [0.517, 0.625, 0.750, 1.333] },
+    { decade: "289–280", year: 285, prices: [0.625, 0.850, 3.733, 4.150] },
+    { decade: "279–270", year: 275, prices: [0.417, 0.717, 1.167, 3.108] },
+    { decade: "269–260", year: 265, prices: [0.667, 1.242, 2.192, 2.492] },
+    { decade: "259–250", year: 255, prices: [0.467, 0.625, 3.108, 4.667] },
+    { decade: "249–240", year: 245, prices: [0.433, 0.500, 2.492, 3.117] },
+    { decade: "239–230", year: 235, prices: [0.675, 0.833, 3.733, 4.150] },
+    { decade: "229–220", year: 225, prices: [0.567, 0.833, 1.100, 1.558] },
+    { decade: "219–210", year: 215, prices: [0.625, 0.892, 0.892, 1.242] },
+    { decade: "209–200", year: 205, prices: [0.500, 0.517, 1.242, 2.333] },
+    { decade: "199–190", year: 195, prices: [0.392, 0.625, 1.558, 2.192] },
+    { decade: "189–180", year: 185, prices: [0.283, 0.467, 1.333, 1.867] },
+    { decade: "179–170", year: 175, prices: [0.633, 0.717, 1.433, 1.833] },
+    { decade: "169–160", year: 165, prices: [0.292, 0.300, 1.242, 1.625] },
+    { decade: "159–150", year: 155, prices: [0.750, 0.850, 1.242, 2.142] },
+    { decade: "149–140", year: 145, prices: [0.542, 0.667, 1.333, 1.700] },
+    { decade: "139–130", year: 135, prices: [0.833, 0.850, 2.333, 2.667] },
+    { decade: "129–120", year: 125, prices: [1.242, 1.283, 6.217, 12.442] },
+    { decade: "119–110", year: 115, prices: [0.533, 1.400, 1.400, 4.667] },
+    { decade: "109–100", year: 105, prices: [0.933, 0.933, 2.333, 4.142] },
+    { decade: "99–90", year: 95, prices: [1.033, 1.100, 2.242, 3.925] },
+    { decade: "89–80", year: 85, prices: [1.658, 2.800, 4.975, 31.992] },
+    { decade: "79–70", year: 75, prices: [2.317, 2.492, 2.800, 2.958] },
+    { decade: "69–60", year: 65, prices: [3.442, 3.442, 3.583, 3.583] }
+  ]
+
+  const getSortableDate = (d) => {
+    const monthOffset = d.month ? (d.month - 1) / 12 : 0
+    return -d.year + monthOffset
+  }
+
+  const processData = (rawData) => {
+    return rawData
+      .map(d => ({
+        ...d,
+        timeValue: getSortableDate(d),
+        displayDate: `${d.year} BC${d.month ? `, M${d.month}` : ''}`
+      }))
+      .sort((a, b) => a.timeValue - b.timeValue)
+  }
+
+  // Process Babylonian data into format for chart
+  const babylonianBarleyData = useMemo(() => {
+    if (showAllBabylonianPrices) {
+      // Create a combined dataset with all 4 prices per decade
+      const combinedData = babylonianBarleyRaw.map(decade => {
+        const timeValue = getSortableDate({ year: decade.year, month: null })
+        return {
+          year: decade.year,
+          month: null,
+          timeValue: timeValue,
+          displayDate: `${decade.year} BC`,
+          decade: decade.decade,
+          lowest: decade.prices[0],
+          secondLowest: decade.prices[1],
+          secondHighest: decade.prices[2],
+          highest: decade.prices[3],
+          source: "Babylonian Astronomical Diaries"
+        }
+      })
+      return combinedData.sort((a, b) => a.timeValue - b.timeValue)
+    } else {
+      // Show average of all 4 prices
+      const avgData = babylonianBarleyRaw.map(decade => {
+        const avg = (decade.prices[0] + decade.prices[1] + decade.prices[2] + decade.prices[3]) / 4
+        return {
+          year: decade.year,
+          month: null,
+          price: avg,
+          source: "Babylonian Astronomical Diaries",
+          type: "average",
+          decade: decade.decade
+        }
+      })
+      return processData(avgData)
+    }
+  }, [showAllBabylonianPrices])
 
   const wheatData = [
     { year: 415, month: null, price: 6.5, source: "Athens" },
@@ -344,24 +426,9 @@ function Home() {
     { year: 72, month: null, price: 1.29, source: "Egyptian Prices" },
   ]
 
-  const getSortableDate = (d) => {
-    const monthOffset = d.month ? (d.month - 1) / 12 : 0
-    return -d.year + monthOffset
-  }
-
   const formatBCTick = (val) => {
     const year = Math.floor(Math.abs(val))
     return `${year} BC`
-  }
-
-  const processData = (rawData) => {
-    return rawData
-      .map(d => ({
-        ...d,
-        timeValue: getSortableDate(d),
-        displayDate: `${d.year} BC${d.month ? `, M${d.month}` : ''}`
-      }))
-      .sort((a, b) => a.timeValue - b.timeValue)
   }
 
   const commodities = useMemo(() => {
@@ -401,46 +468,69 @@ function Home() {
       description: "Note that these are piglet prices; piglets were not consumed, but instead sacrificed. The first two prices are from an Athenian sacrficial calendar, the rest are from Delos."
     }
 
-    const egyptianWheat = {
-      name: "Egyptian Wheat",
-      symbol: "EGWHT-ARC",
-      data: processData(egyptianWheatData),
-      color: "#dc2626",
-      unit: "Drachmas / Artaba (29 kg)",
-      description: "Enter your text for Egyptian Wheat here. Egypt was the breadbasket of the ancient Mediterranean."
-    }
+     const egyptianWheat = {
+       name: "Egyptian Wheat",
+       symbol: "EGWHT-ARC",
+       data: processData(egyptianWheatData),
+       color: "#dc2626",
+       unit: "Drachmas / Artaba (29 kg)",
+       description: "Enter your text for Egyptian Wheat here. Egypt was the breadbasket of the ancient Mediterranean."
+     }
 
-    // Return separated lists
-    return {
-      delos: [wheat, barley, oil, pig],
-      egypt: [egyptianWheat]
-    }
-  }, [])
+     const babylonianBarley = {
+       name: "Barley (Babylon)",
+       symbol: "BRLY-BAB",
+       data: babylonianBarleyData,
+       color: "#eab308",
+       unit: "Drachmas / Medimnos",
+       description: "Price data from Babylonian Astronomical Diaries. Each decade shows four prices: lowest, 2nd lowest, 2nd highest, and highest recorded prices for that period.",
+       isBabylonian: true
+     }
+
+     // Return separated lists
+     return {
+       delos: [wheat, barley, oil, pig],
+       egypt: [egyptianWheat],
+       babylon: [babylonianBarley]
+     }
+  }, [babylonianBarleyData])
 
   const getLatestPrice = (data) => {
+    if (!data || data.length === 0) return { price: 0 }
     return data[data.length - 1]
   }
 
   const getPreviousPrice = (data) => {
+    if (!data || data.length === 0) return { price: 0 }
     return data.length > 1 ? data[data.length - 2] : data[data.length - 1]
   }
 
   const getPriceChange = (data) => {
+    if (!data || data.length === 0) return 0
     const latest = getLatestPrice(data)
     const previous = getPreviousPrice(data)
-    return latest.price - previous.price
+    // Handle Babylonian data structure
+    const latestPrice = latest.price !== undefined ? latest.price : 
+                       (latest.lowest !== undefined ? (latest.lowest + latest.secondLowest + latest.secondHighest + latest.highest) / 4 : 0)
+    const previousPrice = previous.price !== undefined ? previous.price : 
+                         (previous.lowest !== undefined ? (previous.lowest + previous.secondLowest + previous.secondHighest + previous.highest) / 4 : 0)
+    return latestPrice - previousPrice
   }
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload
+      // For Babylonian data with multiple lines, show the specific price being hovered
+      const priceValue = payload[0].value || data.price
       return (
         <div className="custom-tooltip">
-          <p className="tooltip-date">{data.displayDate}</p>
+          <p className="tooltip-date">{data.displayDate || `${Math.abs(Math.floor(label))} BC`}</p>
+          {data.decade && <p className="tooltip-decade">Decade: {data.decade} BCE</p>}
           <p className="tooltip-price">
-            Price: <span className="tooltip-value">{data.price}</span>
+            Price: <span className="tooltip-value">{priceValue.toFixed(3)}</span>
           </p>
-          <p className="tooltip-source">Source: {data.source}</p>
+          {payload[0].name && <p className="tooltip-name">{payload[0].name}</p>}
+          <p className="tooltip-source">Source: {data.source || "Babylonian Astronomical Diaries"}</p>
         </div>
       )
     }
@@ -454,6 +544,19 @@ function Home() {
     const change = getPriceChange(commodity.data)
     const isPositive = change >= 0
     const percentChange = ((change / previous.price) * 100).toFixed(1)
+
+    // For Babylonian data, calculate average for latest price display
+    let displayLatest = latest
+    if (commodity.isBabylonian && showAllBabylonianPrices) {
+      // Calculate average from the 4 price lines
+      const latestData = commodity.data[commodity.data.length - 1]
+      if (latestData && latestData.lowest !== undefined) {
+        const avg = (latestData.lowest + latestData.secondLowest + latestData.secondHighest + latestData.highest) / 4
+        displayLatest = { ...latestData, price: avg }
+      }
+    } else if (commodity.isBabylonian && !showAllBabylonianPrices) {
+      displayLatest = latest
+    }
 
     return (
       <div 
@@ -523,7 +626,7 @@ function Home() {
             <span className="commodity-symbol">{commodity.symbol}</span>
           </div>
           <div className="commodity-price-info">
-            <div className="commodity-price">{latest.price.toFixed(2)}</div>
+            <div className="commodity-price">{displayLatest.price.toFixed(2)}</div>
             <div className={`commodity-change ${isPositive ? 'positive' : 'negative'}`}>
               {isPositive ? '+' : ''}{change.toFixed(2)} ({isPositive ? '+' : ''}{percentChange}%)
             </div>
@@ -533,7 +636,10 @@ function Home() {
         
         <div className="chart-container">
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={commodity.data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+            <LineChart 
+              data={commodity.data} 
+              margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#D2B48C" opacity={0.3} />
               <XAxis 
                 dataKey="timeValue" 
@@ -552,15 +658,53 @@ function Home() {
                 domain={['auto', 'auto']}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#8B7355', strokeWidth: 1, strokeDasharray: '3 3' }} />
-              <Line 
-                type="monotone" 
-                dataKey="price" 
-                stroke={commodity.color} 
-                strokeWidth={2} 
-                dot={{ r: 3, fill: commodity.color, strokeWidth: 1, stroke: '#f4e8d0' }} 
-                activeDot={{ r: 5, strokeWidth: 0 }}
-                animationDuration={500}
-              />
+              {commodity.isBabylonian && showAllBabylonianPrices ? (
+                // Show 4 separate lines for Babylonian data
+                <>
+                  <Line 
+                    type="monotone" 
+                    dataKey="lowest" 
+                    stroke="#991b1b" 
+                    strokeWidth={1.5}
+                    dot={{ r: 2, fill: '#991b1b' }}
+                    name="Lowest"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="secondLowest" 
+                    stroke="#dc2626" 
+                    strokeWidth={1.5}
+                    dot={{ r: 2, fill: '#dc2626' }}
+                    name="2nd Lowest"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="secondHighest" 
+                    stroke="#f97316" 
+                    strokeWidth={1.5}
+                    dot={{ r: 2, fill: '#f97316' }}
+                    name="2nd Highest"
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="highest" 
+                    stroke="#ea580c" 
+                    strokeWidth={1.5}
+                    dot={{ r: 2, fill: '#ea580c' }}
+                    name="Highest"
+                  />
+                </>
+              ) : (
+                <Line 
+                  type="monotone" 
+                  dataKey="price" 
+                  stroke={commodity.color} 
+                  strokeWidth={2} 
+                  dot={{ r: 3, fill: commodity.color, strokeWidth: 1, stroke: '#f4e8d0' }} 
+                  activeDot={{ r: 5, strokeWidth: 0 }}
+                  animationDuration={500}
+                />
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -656,29 +800,128 @@ function Home() {
             </div>
           </div>
 
-          {/* Ancient Egypt Section */}
-          <div style={{ marginTop: '30px', marginBottom: '40px' }}>
-            <h3 style={{ 
-              color: '#8B7355', 
-              borderBottom: '1px solid #D2B48C', 
-              paddingBottom: '10px', 
-              marginBottom: '20px',
-              fontFamily: 'serif'
-            }}>
-              Ancient Egypt
-            </h3>
-            
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.5)', 
-              border: '1px solid #D2B48C', 
-              borderRadius: '8px',
-              padding: '20px'
-            }}>
+           {/* Ancient Egypt Section */}
+           <div style={{ marginTop: '30px', marginBottom: '40px' }}>
+             <h3 style={{ 
+               color: '#8B7355', 
+               borderBottom: '1px solid #D2B48C', 
+               paddingBottom: '10px', 
+               marginBottom: '20px',
+               fontFamily: 'serif'
+             }}>
+               Ancient Egypt
+             </h3>
+             
+             <div style={{ 
+               backgroundColor: 'rgba(255, 255, 255, 0.5)', 
+               border: '1px solid #D2B48C', 
+               borderRadius: '8px',
+               padding: '20px'
+             }}>
+               {/* Egypt Header with Image */}
+               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', gap: '20px' }}>
+                 <div style={{ 
+                   width: '120px', 
+                   height: '120px', 
+                   borderRadius: '50%', 
+                   overflow: 'hidden', 
+                   border: '3px solid #8B7355',
+                   flexShrink: 0,
+                   backgroundColor: '#D2B48C',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   fontSize: '48px'
+                 }}>
+                   🌾
+                 </div>
+                 <div>
+                   <h4 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', color: '#5A4A35' }}>Ancient Egypt</h4>
+                   <p style={{ margin: 0, maxWidth: '600px', lineHeight: '1.5', color: '#4a4a4a' }}>
+                     Egypt was the breadbasket of the ancient Mediterranean world. The fertile Nile Valley produced vast quantities of grain, particularly wheat, which was exported throughout the region. The price data shown here comes from Egyptian papyri, primarily the Zenon Archive, which provides detailed records of grain transactions in the Ptolemaic period. These records offer valuable insights into the economic conditions and price fluctuations in one of the most important agricultural regions of antiquity.
+                   </p>
+                 </div>
+               </div>
+
                <div className="commodities-grid">
-                {commodities.egypt.map(commodity => renderCommodityCard(commodity))}
-              </div>
-            </div>
-          </div>
+                 {commodities.egypt.map(commodity => renderCommodityCard(commodity))}
+               </div>
+             </div>
+           </div>
+
+           {/* Babylonian Section */}
+           <div style={{ marginTop: '30px', marginBottom: '40px' }}>
+             <h3 style={{ 
+               color: '#8B7355', 
+               borderBottom: '1px solid #D2B48C', 
+               paddingBottom: '10px', 
+               marginBottom: '20px',
+               fontFamily: 'serif'
+             }}>
+               Ancient Babylon
+             </h3>
+             
+             <div style={{ 
+               backgroundColor: 'rgba(255, 255, 255, 0.5)', 
+               border: '1px solid #D2B48C', 
+               borderRadius: '8px',
+               padding: '20px'
+             }}>
+               {/* Babylon Header with Image */}
+               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '25px', gap: '20px' }}>
+                 <div style={{ 
+                   width: '120px', 
+                   height: '120px', 
+                   borderRadius: '50%', 
+                   overflow: 'hidden', 
+                   border: '3px solid #8B7355',
+                   flexShrink: 0,
+                   backgroundColor: '#D2B48C',
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   fontSize: '48px'
+                 }}>
+                   📜
+                 </div>
+                 <div>
+                   <h4 style={{ margin: '0 0 10px 0', fontSize: '1.5rem', color: '#5A4A35' }}>Ancient Babylon</h4>
+                   <p style={{ margin: 0, maxWidth: '600px', lineHeight: '1.5', color: '#4a4a4a' }}>
+                     The Babylonian Astronomical Diaries are a remarkable collection of cuneiform tablets that record astronomical observations, weather conditions, and commodity prices from ancient Mesopotamia. These diaries, spanning from the 7th to the 1st century BCE, provide one of the longest continuous economic time series from the ancient world. The barley price data shown here represents four price points per decade: the lowest, second lowest, second highest, and highest recorded prices, offering a comprehensive view of price volatility in the Babylonian grain market.
+                   </p>
+                 </div>
+               </div>
+
+               {/* Toggle button for Babylonian data - above the grid */}
+               {commodities.babylon.some(c => c.isBabylonian) && (
+                 <div style={{ marginBottom: '15px', display: 'flex', justifyContent: 'flex-end' }}>
+                   <button
+                     onClick={() => setShowAllBabylonianPrices(!showAllBabylonianPrices)}
+                     style={{
+                       padding: '8px 16px',
+                       fontSize: '12px',
+                       backgroundColor: showAllBabylonianPrices ? '#8B7355' : '#D2B48C',
+                       color: '#f4e8d0',
+                       border: '1px solid #8B7355',
+                       borderRadius: '4px',
+                       cursor: 'pointer',
+                       fontFamily: 'serif',
+                       transition: 'background-color 0.2s',
+                       fontWeight: '500'
+                     }}
+                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = showAllBabylonianPrices ? '#6B5B3D' : '#B8A082'}
+                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = showAllBabylonianPrices ? '#8B7355' : '#D2B48C'}
+                   >
+                     {showAllBabylonianPrices ? 'Show Average' : 'Show All Prices'}
+                   </button>
+                 </div>
+               )}
+
+               <div className="commodities-grid">
+                 {commodities.babylon.map(commodity => renderCommodityCard(commodity))}
+               </div>
+             </div>
+           </div>
 
         </div>
 
