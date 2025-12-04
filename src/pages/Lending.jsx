@@ -163,7 +163,7 @@ function Lending() {
         fontSize: '0.8rem', 
         color: '#9ca3af' 
       }}>
-        Financial advice based on historical practices. Consult your local trapezites.
+        Financial advice based on historical practices.
       </footer>
     </div>
   )
