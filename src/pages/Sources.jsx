@@ -205,9 +205,7 @@ function Sources() {
 
         </div>
         
-        <div className="article-footer" style={{ textAlign: 'center' }}>
-          &copy; 2025 The Athenian Daily.
-        </div>
+
       </div>
     </div>
   );
